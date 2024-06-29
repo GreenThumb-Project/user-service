@@ -1,0 +1,1 @@
+CREATE TYPE user_expertise AS ENUM ('beginner', 'intermediate', 'advanced', 'expert');
