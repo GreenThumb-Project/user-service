@@ -1,4 +1,4 @@
-CURRENT_DIR=$(shell pwd)
+ CURRENT_DIR=$(shell pwd)
 DBURL := postgres://postgres:03212164@localhost:5432/user_service?sslmode=disable
 
 proto-gen:
