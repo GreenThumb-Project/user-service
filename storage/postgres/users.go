@@ -14,50 +14,73 @@ func NewUserRepo(db *sql.DB) *UserRepo {
 	return &UserRepo{DB: db}
 }
 
-func (u *UserRepo) GetUserById(id string) (*pb.CreateUsersResponce, error) {
+// GET user by id
+func (u *UserRepo) GetUserById(id string) (*pb.GetUserByIdResponce, error) {
+	user := pb.GetUserByIdResponce{}
 
-	return nil, nil
-}
-
-//------------------------------------------------------------------------------
-
-func (u *UserRepo) CreateUser(user *pb.CreateUsersRequest) (*pb.CreateUsersResponce, error) {
-	var users *pb.CreateUsersResponce
 	err := u.DB.QueryRow(`
-			INSERT INTO 
-			users(
-				id,
-				username,
-				email,
-				password_hash
-			VALUES($1,$2,$3))
-		`, user.UserId, user.UserName, user.Email).Scan(&users)
+		SELECT
+			id,
+			username,
+			email
+		FROM
+			users
+		WHERE
+			deleted_at = 0 and id = $1
+	`, id).Scan(&user.UserId, &user.UserName, &user.Email)
 
-	return &pb.CreateUsersResponce{UserId: users.UserId,
-		UserName: users.UserName,
-		Email:    users.Email}, err
+	return &user, err
 }
 
-//-------------------------------------------------------------------------------------------
+//CREATE user
+
+func (u *UserRepo) CreateUser(in *pb.CreateUsersRequest) (*pb.CreateUsersResponce, error) {
+	var user pb.CreateUsersResponce
+	err := u.DB.QueryRow(`
+		INSERT INTO 
+		users(
+			username,
+			email
+		)
+		VALUES($1,$2,$3)
+		RETURNING 
+			id,
+			username,
+			email
+	`, in.UserId, in.UserName, in.Email).Scan(&user.UserId, &user.UserName, &user.Email)
+
+	fmt.Println(user.Email)
+	return &pb.CreateUsersResponce{
+		UserId:   user.UserId,
+		UserName: user.UserName,
+		Email:    user.Email}, err
+}
+
+//Userni Id si orqali topib ochirish delted_at columnni update qilish kerak
 
 func (u *UserRepo) DeleteUser(id string) (*pb.DeleteUserResponce, error) {
-
-	_, err := u.DB.Exec(`
-			UPDATE TABLE 
+	res, err := u.DB.Exec(`
+		UPDATE  
 			users 
-			SET
-				deleted_at = date_part('epoch', current_timestamp)::INT 
-				where 
-					id=$1
-			`, id)
-	if err != nil {
+		SET
+			deleted_at = date_part('epoch', current_timestamp)::INT 
+		WHERE 
+			deleted_at = 0 and id=$1
+	`, id)
+
+	if err != nil{
+		return &pb.DeleteUserResponce{Success: false}, err
+	}
+		
+	rowsAffected, err := res.RowsAffected()
+	if err != nil || rowsAffected == 0{
 		return &pb.DeleteUserResponce{Success: false}, err
 	}
 
 	return &pb.DeleteUserResponce{Success: true}, nil
 }
 
-//------------------------------------------------------------------------------------------
+//GETUserByID profile 
 
 func (u *UserRepo) GetUserByIdProfile(id string) (*pb.GetUserByIdProfileResponces, error) {
 
@@ -72,27 +95,38 @@ func (u *UserRepo) GetUserByIdProfile(id string) (*pb.GetUserByIdProfileResponce
 				location,
 				avatar_url
 			FROM
-				user_profiles
-			WHERE user_id=$1
+				user_profiles up
+			INNER JOIN
+				users u ON up.user_id = u.user_id
+			WHERE 
+				u.deleted_at = 0 and user_id=$1
 				`, id).Scan(&userProfile)
 
-	if err != nil {
-		return nil, err
-	}
-
-	return userProfile, nil
+	return userProfile, err
 }
 
-//---------------------------------------------------------------------------------------------
 
+//Update user profile
 func (u *UserRepo) UpdateUserProfile(in *pb.UpdateUserProfileRequest) (*pb.UpdateUserProfileResponces, error) {
+	var checker int
+	err := u.DB.QueryRow(`
+		SELECT 
+			deleted_at 
+		FROM 
+			users 
+		WHERE 
+			deleted_ad = 0 and id=$1
+		`, in.UserId).Scan(&checker)
+	if checker != 0 || err != nil {
+		return nil, fmt.Errorf("%s user is not found or already deleted", in.UserId)
+	}
 
-	query := `update user_profiles set `
+	query := `UPDATE user_profiles SET `
 	n := 1
 	var arr []interface{}
-	if len(in.FulName) > 0 {
+	if len(in.FullName) > 0 {
 		query += fmt.Sprintf("full_name=$%d, ", n)
-		arr = append(arr, in.FulName)
+		arr = append(arr, in.FullName)
 		n++
 	}
 	if len(in.Bio) > 0 {
@@ -111,17 +145,17 @@ func (u *UserRepo) UpdateUserProfile(in *pb.UpdateUserProfileRequest) (*pb.Updat
 		n++
 	}
 
-	if len(in.AvataEUrl) > 0 {
+	if len(in.AvatarUrl) > 0 {
 		query += fmt.Sprintf("avatar_url=$%d, ", n)
-		arr = append(arr, in.AvataEUrl)
+		arr = append(arr, in.AvatarUrl)
 		n++
 	}
 	arr = append(arr, in.UserId)
 
-	query += fmt.Sprintf(" where user_id=$%d ", n)
+	query += fmt.Sprintf(" WHERE user_id=$%d ", n)
 
-	_, err := u.DB.Exec(query, arr...)
-	
+	_, err = u.DB.Exec(query, arr...)
+
 	if err != nil {
 		return &pb.UpdateUserProfileResponces{Success: false}, err
 	}

@@ -15,7 +15,7 @@ func NewUserService(db *postgres.UserRepo) *ServerUser {
 	return &ServerUser{DB: db}
 }
 
-func (s ServerUser) GetUserByIdctx(ctx context.Context, req *pb.GetUserByIdRequest) (*pb.GetUserByIdResponce, error) {
+func (s ServerUser) GetUserById(ctx context.Context, req *pb.GetUserByIdRequest) (*pb.GetUserByIdResponce, error) {
 	return s.DB.GetUserById(req.UserId)
 }
 
@@ -32,5 +32,5 @@ func (s ServerUser) GetUserByIdProfile(ctx context.Context, req *pb.GetUserByIdP
 }
 
 func (s ServerUser) UpdateUserProfile(ctx context.Context, req *pb.UpdateUserProfileRequest) (*pb.UpdateUserProfileResponces, error) {
-	return s.DB.UpdateUserProfile(req.UserId)
+	return s.DB.UpdateUserProfile(req)
 }
