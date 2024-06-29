@@ -1,0 +1,79 @@
+syntax="proto3";
+
+package users;
+
+service UserManagement{
+
+    rpc GetUserById(GetUserByIdRequest) returns (GetUserByIdResponce);
+
+    rpc CreateUser(CreateUsersRequest) returns (CreateUsersResponce);
+
+    rpc DeleteUser(DeleteUserRequest) returns (DeleteUserResponce);
+
+    rpc GetUserByIdProfile(GetUserByIdProfileRequest) returns (GetUserByIdProfileResponces);
+
+    rpc  UpdateUserProfile(UpdateUserProfileRequest) returns (UpdateUserProfileResponces);
+}
+
+message GetUserByIdRequest{
+    string UserId=1;
+}
+
+message GetUserByIdResponce{
+    string UserId=1;
+    string UserName=2;
+    string Email =3;
+}
+
+//----------------------------------------------
+message CreateUsersRequest{
+    string UserId=1;
+    string UserName=2;
+    string Email =3;
+}
+
+message CreateUsersResponce{
+    string UserId=1;
+    string UserName=2;
+    string Email =3;
+}
+
+//----------------------------------------------
+
+message DeleteUserRequest{
+    string UserId=1;
+}
+
+message DeleteUserResponce{
+    bool Success=1;
+}
+
+//-----------------------------------------------
+
+message GetUserByIdProfileRequest{
+    string UserId=1;
+}
+
+message GetUserByIdProfileResponces{
+    string UserId=1;
+    string FulName=2;
+    string Bio=3;
+    string User_expertise=4;
+    string Location=5;
+    string AvataEUrl=6;
+}
+
+//-------------------------------------
+
+message UpdateUserProfileRequest{
+    string UserId=1;
+}
+
+message UpdateUserProfileResponces{
+    string UserId=1;
+    string FulName=2;
+    string Bio=3;
+    string User_expertise=4;
+    string Location=5;
+    string AvataEUrl=6;
+}
