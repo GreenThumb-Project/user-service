@@ -69,7 +69,7 @@ message GetUserByIdProfileResponces{
 
 message UpdateUserProfileRequest{
     string UserId=1;
-    string FulName=2;
+    string FullName=2;
     string Bio=3;
     string UserExpertise=4;
     string Location=5;
