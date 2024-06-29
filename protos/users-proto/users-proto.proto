@@ -60,7 +60,7 @@ message GetUserByIdProfileResponces{
     string UserId=1;
     string FulName=2;
     string Bio=3;
-    string User_expertise=4;
+    string UserExpertise=4;
     string Location=5;
     string AvataEUrl=6;
 }
@@ -69,13 +69,13 @@ message GetUserByIdProfileResponces{
 
 message UpdateUserProfileRequest{
     string UserId=1;
+    string FulName=2;
+    string Bio=3;
+    string UserExpertise=4;
+    string Location=5;
+    string AvataEUrl=6;
 }
 
 message UpdateUserProfileResponces{
-    string UserId=1;
-    string FulName=2;
-    string Bio=3;
-    string User_expertise=4;
-    string Location=5;
-    string AvataEUrl=6;
+    bool success = 1;
 }
