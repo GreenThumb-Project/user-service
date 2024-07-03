@@ -6,31 +6,41 @@ import (
 	"user_service/storage/postgres"
 )
 
-type ServerUser struct {
+type UserService struct {
 	pb.UnimplementedUserManagementServer
-	DB *postgres.UserRepo
+	User *postgres.UserRepo
 }
 
-func NewUserService(db *postgres.UserRepo) *ServerUser {
-	return &ServerUser{DB: db}
+func NewUserService(user *postgres.UserRepo) *UserService {
+	return &UserService{User: user}
 }
 
-func (s ServerUser) GetUserById(ctx context.Context, req *pb.GetUserByIdRequest) (*pb.GetUserByIdResponce, error) {
-	return s.DB.GetUserById(req.UserId)
+func (s UserService) GetUserById(ctx context.Context, req *pb.GetUserByIdRequest) (*pb.GetUserByIdResponce, error) {
+	return s.User.GetUserById(req.UserId)
 }
 
-func (s ServerUser) CreateUser(ctx context.Context, req *pb.CreateUsersRequest) (*pb.CreateUsersResponce, error) {
-	return s.DB.CreateUser(req)
+func (s UserService) CreateUser(ctx context.Context, req *pb.CreateUsersRequest) (*pb.CreateUsersResponce, error) {
+	return s.User.CreateUser(req)
 }
 
-func (s ServerUser) DeleteUser(ctx context.Context, req *pb.DeleteUserRequest) (*pb.DeleteUserResponce, error) {
-	return s.DB.DeleteUser(req.UserId)
+func (s UserService) DeleteUser(ctx context.Context, req *pb.DeleteUserRequest) (*pb.DeleteUserResponce, error) {
+	return s.User.DeleteUser(req.UserId)
 }
 
-func (s ServerUser) GetUserByIdProfile(ctx context.Context, req *pb.GetUserByIdProfileRequest) (*pb.GetUserByIdProfileResponces, error) {
-	return s.DB.GetUserByIdProfile(req.UserId)
+func (s *UserService) CreateUserProfile(ctx context.Context, in *pb.CreateProfileUsersRequest) (*pb.CreateProfileUsersResponce, error) {
+	resp, err := s.User.CreateUserProfile(in)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
 }
 
-func (s ServerUser) UpdateUserProfile(ctx context.Context, req *pb.UpdateUserProfileRequest) (*pb.UpdateUserProfileResponces, error) {
-	return s.DB.UpdateUserProfile(req)
+func (s UserService) GetUserByIdProfile(ctx context.Context, req *pb.GetUserByIdProfileRequest) (*pb.GetUserByIdProfileResponces, error) {
+	return s.User.GetUserByIdProfile(req.UserId)
+}
+
+func (s UserService) UpdateUserProfile(ctx context.Context, req *pb.UpdateUserProfileRequest) (*pb.UpdateUserProfileResponces, error) {
+	return s.User.UpdateUserProfile(req)
 }
