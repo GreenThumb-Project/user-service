@@ -15,6 +15,16 @@ func NewUserService(user *postgres.UserRepo) *UserService {
 	return &UserService{User: user}
 }
 
+func (s *UserService) CheckUser(ctx context.Context, in *pb.GetUserByIdRequest) (*pb.GetUserByIdResponce, error) {
+	user, err := s.User.GetUserById(in.UserId)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return user, nil
+}
+
 func (s UserService) GetUserById(ctx context.Context, req *pb.GetUserByIdRequest) (*pb.GetUserByIdResponce, error) {
 	return s.User.GetUserById(req.UserId)
 }
