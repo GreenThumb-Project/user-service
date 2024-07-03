@@ -56,7 +56,7 @@ func (u *UserRepo) CreateUser(in *pb.CreateUsersRequest) (*pb.CreateUsersResponc
 		Email:    user.Email}, err
 }
 
-//Userni Id si orqali topib ochirish delted_at columnni update qilish kerak
+//Userni Id si orqali topib delted_at columnni update qilish kerak
 
 func (u *UserRepo) DeleteUser(id string) (*pb.DeleteUserResponce, error) {
 	res, err := u.DB.Exec(`
@@ -105,6 +105,31 @@ func (u *UserRepo) GetUserByIdProfile(id string) (*pb.GetUserByIdProfileResponce
 	return userProfile, err
 }
 
+
+
+
+func (u *UserRepo) CreateUserProfile(userProfile *pb.CreateProfileUsersRequest) (*pb.CreateProfileUsersResponce, error) {
+
+	_, err := u.DB.Exec(`
+		INSERT INTO
+			user_id,
+			full_name,
+			bio,
+			user_expertise,
+			location,
+			avatar_url
+		FROM
+			user_profiles up
+		`, userProfile.UserId, userProfile.FullName, userProfile.Bio, 
+		userProfile.UserExpertise, userProfile.Location, userProfile.AvatarUrl)
+
+	
+	if err !=  nil {
+		return &pb.CreateProfileUsersResponce{Success: false}, err
+	}
+
+	return &pb.CreateProfileUsersResponce{Success: true}, nil
+}
 
 //Update user profile
 func (u *UserRepo) UpdateUserProfile(in *pb.UpdateUserProfileRequest) (*pb.UpdateUserProfileResponces, error) {
