@@ -107,7 +107,7 @@ func (u *UserRepo) GetUserByIdProfile(id string) (*pb.GetUserByIdProfileResponce
 
 func (u *UserRepo) CreateUserProfile(userProfile *pb.CreateProfileUsersRequest) (*pb.CreateProfileUsersResponce, error) {
 
-	_, err := u.DB.Exec(`
+	row, err := u.DB.Exec(`
 		INSERT INTO
 		user_profiles(
 			user_id,
@@ -124,8 +124,10 @@ func (u *UserRepo) CreateUserProfile(userProfile *pb.CreateProfileUsersRequest) 
 			$5,
 			$6)
 		`, userProfile.UserId, userProfile.FullName, userProfile.Bio,userProfile.UserExpertise, userProfile.Location, userProfile.AvatarUrl)
-
+	fmt.Println(row)
 	if err != nil {
+		fmt.Println("wkedjfidjif")
+
 		return &pb.CreateProfileUsersResponce{Success: false}, err
 	}
 
@@ -176,9 +178,9 @@ func (u *UserRepo) UpdateUserProfile(in *pb.UpdateUserProfileRequest) (*pb.Updat
 		arr = append(arr, in.AvatarUrl)
 		n++
 	}
+	query = query[:len(query)-2]
 	arr = append(arr, in.UserId)
-
-	query += fmt.Sprintf(" WHERE user_id=$%d ", n)
+	query += fmt.Sprintf(" where user_id=$%d ", n)
 
 	_, err = u.DB.Exec(query, arr...)
 
