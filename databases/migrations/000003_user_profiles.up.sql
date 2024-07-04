@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS user_profiles (
-    user_id UUID PRIMARY KEY REFERENCES users(id),
+    user_id UUID REFERENCES users(id),
     full_name VARCHAR(100),
     bio TEXT,
     expertise user_expertise DEFAULT 'beginner',

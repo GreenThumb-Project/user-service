@@ -1,0 +1,78 @@
+               List of relations
+ Schema |       Name        | Type  |  Owner   
+--------+-------------------+-------+----------
+ public | schema_migrations | table | postgres
+ public | user_profiles     | table | postgres
+ public | users             | table | postgres
+(3 rows)
+
+               List of relations
+ Schema |       Name        | Type  |  Owner   
+--------+-------------------+-------+----------
+ public | schema_migrations | table | postgres
+ public | user_profiles     | table | postgres
+ public | users             | table | postgres
+(3 rows)
+
+ version | dirty 
+---------+-------
+      -1 | t
+(1 row)
+
+                                          List of databases
+           Name            |  Owner   | Encoding |   Collate   |    Ctype    |   Access privileges   
+---------------------------+----------+----------+-------------+-------------+-----------------------
+ garden_management_service | postgres | UTF8     | en_US.UTF-8 | en_US.UTF-8 | 
+ garilla                   | postgres | UTF8     | en_US.UTF-8 | en_US.UTF-8 | 
+ go                        | postgres | UTF8     | en_US.UTF-8 | en_US.UTF-8 | 
+ imtihon                   | postgres | UTF8     | en_US.UTF-8 | en_US.UTF-8 | 
+ oy_3                      | postgres | UTF8     | en_US.UTF-8 | en_US.UTF-8 | 
+ postgres                  | postgres | UTF8     | en_US.UTF-8 | en_US.UTF-8 | 
+ sql                       | postgres | UTF8     | en_US.UTF-8 | en_US.UTF-8 | 
+ template0                 | postgres | UTF8     | en_US.UTF-8 | en_US.UTF-8 | =c/postgres          +
+                           |          |          |             |             | postgres=CTc/postgres
+ template1                 | postgres | UTF8     | en_US.UTF-8 | en_US.UTF-8 | =c/postgres          +
+                           |          |          |             |             | postgres=CTc/postgres
+ user_service              | postgres | UTF8     | en_US.UTF-8 | en_US.UTF-8 | 
+ weather                   | postgres | UTF8     | en_US.UTF-8 | en_US.UTF-8 | 
+(11 rows)
+
+ id |  name   
+----+---------
+  1 | John
+  2 | Alice
+  3 | Bob
+  4 | Emily
+  5 | Michael
+  6 | Sarah
+  7 | David
+  8 | Emma
+  9 | Daniel
+ 10 | Olivia
+(10 rows)
+
+               List of relations
+ Schema |       Name        | Type  |  Owner   
+--------+-------------------+-------+----------
+ public | asisstant_teacher | table | postgres
+ public | branch            | table | postgres
+ public | cars              | table | postgres
+ public | course            | table | postgres
+ public | curs              | table | postgres
+ public | gred              | table | postgres
+ public | sstudent          | table | postgres
+ public | student           | table | postgres
+ public | student_curs      | table | postgres
+ public | students          | table | postgres
+ public | talaba            | table | postgres
+ public | teacher           | table | postgres
+ public | user_cars         | table | postgres
+ public | users             | table | postgres
+(14 rows)
+
+                                   List of roles
+ Role name |                         Attributes                         | Member of 
+-----------+------------------------------------------------------------+-----------
+ bekzod    | Superuser, Create role, Create DB                          | {}
+ postgres  | Superuser, Create role, Create DB, Replication, Bypass RLS | {}
+
