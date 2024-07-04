@@ -38,11 +38,11 @@ func (u *UserRepo) CreateUser(in *pb.CreateUsersRequest) (*pb.CreateUsersResponc
 	var user pb.CreateUsersResponce
 	err := u.DB.QueryRow(`
 		INSERT INTO 
-		users(
+		users(id,
 			username,
 			email
 		)
-		VALUES($1,$2,$3)
+		VALUES($1,$2)
 		RETURNING 
 			id,
 			username,
@@ -68,110 +68,111 @@ func (u *UserRepo) DeleteUser(id string) (*pb.DeleteUserResponce, error) {
 			deleted_at = 0 and id=$1
 	`, id)
 
-	if err != nil{
+	if err != nil {
 		return &pb.DeleteUserResponce{Success: false}, err
 	}
-		
+
 	rowsAffected, err := res.RowsAffected()
-	if err != nil || rowsAffected == 0{
+	if err != nil || rowsAffected == 0 {
 		return &pb.DeleteUserResponce{Success: false}, err
 	}
 
 	return &pb.DeleteUserResponce{Success: true}, nil
 }
 
-//GETUserByID profile 
+//GETUserByID profile
 
 func (u *UserRepo) GetUserByIdProfile(id string) (*pb.GetUserByIdProfileResponces, error) {
 
-	var userProfile *pb.GetUserByIdProfileResponces
+	var userProfile pb.GetUserByIdProfileResponces
 
 	err := u.DB.QueryRow(`
 			SELECT
-				user_id,
-				full_name,
-				bio,
-				user_expertise,
-				location,
-				avatar_url
+				up.user_id,
+				up.full_name,
+				up.bio,
+				up.expertise,
+				up.location,
+				up.avatar_url
 			FROM
-				user_profiles up
+				users as u
 			INNER JOIN
-				users u ON up.user_id = u.user_id
+				user_profiles as up ON up.user_id = u.id
 			WHERE 
-				u.deleted_at = 0 and user_id=$1
-				`, id).Scan(&userProfile)
+				u.deleted_at = 0 and up.user_id=$1
+				`, id).Scan(&userProfile.UserId, &userProfile.FullName, &userProfile.Bio, &userProfile.UserExpertise, &userProfile.Location, &userProfile.AvatarUrl)
 
-	return userProfile, err
+	return &userProfile, err
 }
-
-
-
 
 func (u *UserRepo) CreateUserProfile(userProfile *pb.CreateProfileUsersRequest) (*pb.CreateProfileUsersResponce, error) {
 
 	_, err := u.DB.Exec(`
 		INSERT INTO
+		user_profiles(
 			user_id,
 			full_name,
 			bio,
-			user_expertise,
+			expertise,
 			location,
-			avatar_url
-		FROM
-			user_profiles up
-		`, userProfile.UserId, userProfile.FullName, userProfile.Bio, 
-		userProfile.UserExpertise, userProfile.Location, userProfile.AvatarUrl)
+			avatar_url)
+		VALUES(
+			$1,
+			$2,
+			$3,
+			$4,
+			$5,
+			$6)
+		`, userProfile.UserId, userProfile.FullName, userProfile.Bio,userProfile.UserExpertise, userProfile.Location, userProfile.AvatarUrl)
 
-	
-	if err !=  nil {
+	if err != nil {
 		return &pb.CreateProfileUsersResponce{Success: false}, err
 	}
 
 	return &pb.CreateProfileUsersResponce{Success: true}, nil
 }
 
-//Update user profile
 func (u *UserRepo) UpdateUserProfile(in *pb.UpdateUserProfileRequest) (*pb.UpdateUserProfileResponces, error) {
 	var checker int
 	err := u.DB.QueryRow(`
-		SELECT 
-			deleted_at 
-		FROM 
-			users 
-		WHERE 
-			deleted_ad = 0 and id=$1
+		SELECT
+			deleted_at
+		FROM
+			users
+		WHERE
+			deleted_at = 0 and id=$1
 		`, in.UserId).Scan(&checker)
 	if checker != 0 || err != nil {
 		return nil, fmt.Errorf("%s user is not found or already deleted", in.UserId)
 	}
+	fmt.Println("salom")
 
-	query := `UPDATE user_profiles SET `
+	query := ` UPDATE user_profiles SET `
 	n := 1
 	var arr []interface{}
 	if len(in.FullName) > 0 {
-		query += fmt.Sprintf("full_name=$%d, ", n)
+		query += fmt.Sprintf(" full_name=$%d, ", n)
 		arr = append(arr, in.FullName)
 		n++
 	}
 	if len(in.Bio) > 0 {
-		query += fmt.Sprintf("bio=$%d, ", n)
+		query += fmt.Sprintf(" bio=$%d, ", n)
 		arr = append(arr, in.Bio)
 		n++
 	}
 	if len(in.UserExpertise) > 0 {
-		query += fmt.Sprintf("expertise=$%d, ", n)
+		query += fmt.Sprintf(" expertise=$%d, ", n)
 		arr = append(arr, in.UserExpertise)
 		n++
 	}
 	if len(in.Location) > 0 {
-		query += fmt.Sprintf("location=$%d, ", n)
+		query += fmt.Sprintf(" location=$%d, ", n)
 		arr = append(arr, in.Location)
 		n++
 	}
 
 	if len(in.AvatarUrl) > 0 {
-		query += fmt.Sprintf("avatar_url=$%d, ", n)
+		query += fmt.Sprintf(" avatar_url=$%d, ", n)
 		arr = append(arr, in.AvatarUrl)
 		n++
 	}
