@@ -105,9 +105,9 @@ func TestCreateUserProfile(t *testing.T) {
 		panic(err)
 	}
 	user := NewUserRepo(db)
-
+	
 	respcreate, err := user.CreateUserProfile(&pb.CreateProfileUsersRequest{
-		UserId:        "0415e108-cdba-4f6d-9e44-e9268152e23f",
+		UserId:        "c16c9fdc-3c06-46c1-a5a6-d1acc89bc101",
 		FullName:      "dnjokofe",
 		Bio:           "jsdhokud",
 		UserExpertise: "beginner",
@@ -115,6 +115,7 @@ func TestCreateUserProfile(t *testing.T) {
 		AvatarUrl:     "dfngijkmien",
 	})
 	if err != nil {
+		fmt.Println("sjkojijolkjiisdic")
 		log.Fatal(err)
 	}
 	waitcreate := pb.CreateProfileUsersResponce{
@@ -126,15 +127,15 @@ func TestCreateUserProfile(t *testing.T) {
 	}
 }
 
-func TestGetUpdateUserProfile(t *testing.T) {
+func TestUpdateUserProfile(t *testing.T) {
 	db, err := ConnectDb()
 	if err != nil {
 		panic(err)
 	}
 	user := NewUserRepo(db)
 
-	respcreate, err := user.UpdateUserProfile(&pb.UpdateUserProfileRequest{UserId: "0415e108-cdba-4f6d-9e44-e9268152e23f",
-		FullName: "edjff"})
+	respcreate, err := user.UpdateUserProfile(&pb.UpdateUserProfileRequest{UserId: "c86c3d63-d516-4563-9d68-66724285accb",
+		FullName: "edjfsdfff"})
 
 	if err != nil {
 		panic(err)
