@@ -71,7 +71,7 @@ func TestDeleteUser(t *testing.T) {
 
 	if !reflect.DeepEqual(respcreate, &waitcreate) {
 		t.Errorf("have %v , wont %v", respcreate, &waitcreate)
-	}
+	} 
 }
 
 func TestGetUserByIdProfile(t *testing.T) {
