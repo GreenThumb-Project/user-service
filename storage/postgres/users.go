@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 	pb "user_service/generated/users"
 )
@@ -38,22 +39,89 @@ func (u *UserRepo) CreateUser(in *pb.CreateUsersRequest) (*pb.CreateUsersResponc
 	var user pb.CreateUsersResponce
 	err := u.DB.QueryRow(`
 		INSERT INTO 
-		users(id,
+		users(
+			id,
 			username,
-			email
+			email,
+			password
 		)
-		VALUES($1,$2)
+		VALUES (
+			$1,
+			$2,
+			$3,
+			$4
+		)
 		RETURNING 
+			id
+	`, in.UserId, in.UserName, in.Email, in.Password).Scan(&user.UserId)
+
+	return &pb.CreateUsersResponce{
+		UserId: user.UserId}, err
+}
+
+// login
+
+func (u *UserRepo) LoginUser(loginReq *pb.LoginRequest) (*pb.LoginResponse, error) {
+
+	userLog := pb.LoginResponse{}
+	err := u.DB.QueryRow(`
+		SELECT
 			id,
 			username,
 			email
-	`, in.UserId, in.UserName, in.Email).Scan(&user.UserId, &user.UserName, &user.Email)
+		FROM
+			users
+		WHERE
+			email = $1 and password = $2
+	`, loginReq.Email, loginReq.Password).Scan(&userLog.UserId, &userLog.Username, &userLog.Email)
 
-	fmt.Println(user.Email)
-	return &pb.CreateUsersResponce{
-		UserId:   user.UserId,
-		UserName: user.UserName,
-		Email:    user.Email}, err
+	return &userLog, err
+}
+
+// Email exist
+
+func (u *UserRepo) EmailExists(email string) (*pb.EmailExistsResponse, error) {
+	var exists bool
+	err := u.DB.QueryRow(`
+		SELECT
+			EXISTS (
+				SELECT
+					1
+				FROM
+					users
+				WHERE
+					email = $1
+			)
+	`, email).Scan(&exists)
+
+	return &pb.EmailExistsResponse{Exists: exists}, err
+}
+
+func (u *UserRepo) UpdateUser(newUser *pb.UpdateUserRequest) (*pb.UpdateUserResponse, error) {
+	res, err := u.DB.Exec(`
+		UPDATE 
+			users
+		SET
+			username = $1,
+			email = $2,
+			password = $3
+		WHERE
+			user_id = $4
+	`, newUser.Username, newUser.Email, newUser.Password, newUser.UserId)
+
+	if err != nil {
+		return &pb.UpdateUserResponse{Success: false}, err
+	}
+
+	rowsAffect, err := res.RowsAffected()
+
+	if err != nil {
+		return &pb.UpdateUserResponse{Success: false}, err
+	} else if rowsAffect == 0 {
+		return &pb.UpdateUserResponse{Success: false}, errors.New(`user not found `)
+	}
+
+	return &pb.UpdateUserResponse{Success: true}, nil
 }
 
 //Userni Id si orqali topib delted_at columnni update qilish kerak
@@ -115,7 +183,8 @@ func (u *UserRepo) CreateUserProfile(userProfile *pb.CreateProfileUsersRequest) 
 			bio,
 			expertise,
 			location,
-			avatar_url)
+			avatar_url
+		)
 		VALUES(
 			$1,
 			$2,
@@ -124,9 +193,9 @@ func (u *UserRepo) CreateUserProfile(userProfile *pb.CreateProfileUsersRequest) 
 			$5,
 			$6)
 		`, userProfile.UserId, userProfile.FullName, userProfile.Bio,userProfile.UserExpertise, userProfile.Location, userProfile.AvatarUrl)
-	if err != nil {
-		fmt.Println("wkedjfidjif")
+	
 
+	if err != nil {
 		return &pb.CreateProfileUsersResponce{Success: false}, err
 	}
 
@@ -134,19 +203,6 @@ func (u *UserRepo) CreateUserProfile(userProfile *pb.CreateProfileUsersRequest) 
 }
 
 func (u *UserRepo) UpdateUserProfile(in *pb.UpdateUserProfileRequest) (*pb.UpdateUserProfileResponces, error) {
-	var checker int
-	err := u.DB.QueryRow(`
-		SELECT
-			deleted_at
-		FROM
-			users
-		WHERE
-			deleted_at = 0 and id=$1
-		`, in.UserId).Scan(&checker)
-	if checker != 0 || err != nil {
-		return nil, fmt.Errorf("%s user is not found or already deleted", in.UserId)
-	}
-	fmt.Println("salom")
 
 	query := ` UPDATE user_profiles SET `
 	n := 1
@@ -181,7 +237,7 @@ func (u *UserRepo) UpdateUserProfile(in *pb.UpdateUserProfileRequest) (*pb.Updat
 	arr = append(arr, in.UserId)
 	query += fmt.Sprintf(" where user_id=$%d ", n)
 
-	_, err = u.DB.Exec(query, arr...)
+	_, err := u.DB.Exec(query, arr...)
 
 	if err != nil {
 		return &pb.UpdateUserProfileResponces{Success: false}, err
