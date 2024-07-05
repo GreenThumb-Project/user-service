@@ -11,7 +11,7 @@ import (
 )
 
 func main() {
-	db, err := postgres.ConnectDb()
+	db, err := postgres.ConnectDB()
 	if err != nil {
 		log.Fatal("ERROR - ", err.Error())
 	}

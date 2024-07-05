@@ -15,14 +15,24 @@ func NewUserService(user *postgres.UserRepo) *UserService {
 	return &UserService{User: user}
 }
 
-func (s *UserService) CheckUser(ctx context.Context, in *pb.GetUserByIdRequest) (*pb.GetUserByIdResponce, error) {
+func (s *UserService) CheckUser(ctx context.Context, in *pb.UserRequest) (*pb.UserResponse, error) {
 	user, err := s.User.GetUserById(in.UserId)
 
 	if err != nil {
-		return nil, err
+		return &pb.UserResponse{Exists: false}, err
 	}
 
-	return user, nil
+	exists := user.UserId == in.UserId
+
+	return &pb.UserResponse{Exists: exists}, nil
+}
+
+func (s *UserService) EmailExists(ctx context.Context, in *pb.EmailExistsRequest) (*pb.EmailExistsResponse, error) {
+	return s.User.EmailExists(in.Email)
+}
+
+func (s *UserService) Login(ctx context.Context, in *pb.LoginRequest) (*pb.LoginResponse, error) {
+	return s.User.LoginUser(in)
 }
 
 func (s UserService) GetUserById(ctx context.Context, req *pb.GetUserByIdRequest) (*pb.GetUserByIdResponce, error) {
@@ -40,11 +50,7 @@ func (s UserService) DeleteUser(ctx context.Context, req *pb.DeleteUserRequest) 
 func (s *UserService) CreateUserProfile(ctx context.Context, in *pb.CreateProfileUsersRequest) (*pb.CreateProfileUsersResponce, error) {
 	resp, err := s.User.CreateUserProfile(in)
 
-	if err != nil {
-		return nil, err
-	}
-
-	return resp, nil
+	return resp, err
 }
 
 func (s UserService) GetUserByIdProfile(ctx context.Context, req *pb.GetUserByIdProfileRequest) (*pb.GetUserByIdProfileResponces, error) {

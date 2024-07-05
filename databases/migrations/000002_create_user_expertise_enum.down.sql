@@ -1,1 +1,1 @@
-DROP TYPE user_expertise;
+DROP TYPE IF EXISTS user_expertise;

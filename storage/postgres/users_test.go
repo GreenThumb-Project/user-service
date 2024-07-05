@@ -9,12 +9,11 @@ import (
 )
 
 func TestGetUserById(t *testing.T) {
-	db, err := ConnectDb()
+	db, err := ConnectDB()
 	if err != nil {
 		panic(err)
 	}
 	user := NewUserRepo(db)
-	fmt.Println("salom")
 
 	resp, err := user.GetUserById("c86c3d63-d516-4563-9d68-66724285accb")
 	if err != nil {
@@ -33,7 +32,7 @@ func TestGetUserById(t *testing.T) {
 }
 
 func TestCreateUser(t *testing.T) {
-	db, err := ConnectDb()
+	db, err := ConnectDB()
 	if err != nil {
 		panic(err)
 	}
@@ -43,12 +42,11 @@ func TestCreateUser(t *testing.T) {
 		UserId:   "65d52c55-5641-4f4c-b98a-28701deadf5f",
 		UserName: "userq123",
 		Email:    "user1@exampsdfdjdsle.come2",
+		Password: "qwerty2004",
 	})
 
 	waitcreate := pb.CreateUsersResponce{
 		UserId:   "65d52c55-5641-4f4c-b98a-28701deadf5f",
-		UserName: "userq123",
-		Email:    "user1@exampsdfdjdsle.come2",
 	}
 
 	if reflect.DeepEqual(respcreate, &waitcreate) {
@@ -57,7 +55,7 @@ func TestCreateUser(t *testing.T) {
 }
 
 func TestDeleteUser(t *testing.T) {
-	db, err := ConnectDb()
+	db, err := ConnectDB()
 	if err != nil {
 		panic(err)
 	}
@@ -75,7 +73,7 @@ func TestDeleteUser(t *testing.T) {
 }
 
 func TestGetUserByIdProfile(t *testing.T) {
-	db, err := ConnectDb()
+	db, err := ConnectDB()
 	if err != nil {
 		panic(err)
 	}
@@ -100,7 +98,7 @@ func TestGetUserByIdProfile(t *testing.T) {
 }
 
 func TestCreateUserProfile(t *testing.T) {
-	db, err := ConnectDb()
+	db, err := ConnectDB()
 	if err != nil {
 		panic(err)
 	}
@@ -128,7 +126,7 @@ func TestCreateUserProfile(t *testing.T) {
 }
 
 func TestUpdateUserProfile(t *testing.T) {
-	db, err := ConnectDb()
+	db, err := ConnectDB()
 	if err != nil {
 		panic(err)
 	}
