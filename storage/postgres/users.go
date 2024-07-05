@@ -107,7 +107,7 @@ func (u *UserRepo) GetUserByIdProfile(id string) (*pb.GetUserByIdProfileResponce
 
 func (u *UserRepo) CreateUserProfile(userProfile *pb.CreateProfileUsersRequest) (*pb.CreateProfileUsersResponce, error) {
 
-	row, err := u.DB.Exec(`
+	_, err := u.DB.Exec(`
 		INSERT INTO
 		user_profiles(
 			user_id,
@@ -124,7 +124,6 @@ func (u *UserRepo) CreateUserProfile(userProfile *pb.CreateProfileUsersRequest) 
 			$5,
 			$6)
 		`, userProfile.UserId, userProfile.FullName, userProfile.Bio,userProfile.UserExpertise, userProfile.Location, userProfile.AvatarUrl)
-	fmt.Println(row)
 	if err != nil {
 		fmt.Println("wkedjfidjif")
 
